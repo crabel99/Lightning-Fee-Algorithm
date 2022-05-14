@@ -129,7 +129,8 @@
   %   %% Abstract                                 %%
   %   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \begin{abstract}
-
+    This paper outlines a simple strategy to create channels on a Lightning Network routing node that will tend toward a balanced configuration.
+    The algorithm is derived from the principles of statistical mechanics and uses the Helmholtz potential to dynamically assess either inbound or outbound fees.
   \end{abstract}
 
   %   \begin{keyword}
@@ -153,7 +154,6 @@ This is done by treating the sats locked up in a channel as a microcanonical ens
 This will provide us with a combinatorial definition of entropy, which when maximized will define a channel being balanced.
 
 The overall approach of this method is to set up a fee structure using the equivalent of the Helmholtz potential.
-We will look at cases where a node operator may choose to entangle some channels based on a desire to ensure certain channels have a higher entropy than others based on transaction traffic.
 
 \section{Defining the Ensemble}
 We begin by considering a node in isolation from the rest of the network.
@@ -248,7 +248,6 @@ The transaction fee is thus,
   \end{aligned}
 }
 
-
 \section{Measuring Temperature}
 Recall in defining the ensemble that we did not consider the time dependent, kinetic, portion of the Hamiltonian.
 It is not something that is clearly defined for sats on a lightning channel.
@@ -261,15 +260,6 @@ If this provides a reasonable estimation, the rate factor, $\beta$, is the inver
 The node operator would then need to determine what the fractional charge for temperature would be.
 This in effect becomes an average per transaction fee of the change in the entropy.
 It's not clear at this time if the measured channel temperature should be used to assess the fee directly, or if it should be multiplied by some constant.
-
-\section{Entanglement}
-A node operator may wish to preferentially encourage or penalize a particular node to which they have a channel.
-We can do this by looking expanding our single channel ensemble to that of the composite of the node.
-This is done through the node's combined Hamiltonian.
-
-If we take small routing node with three channels, there are $2^3$ possible routing combinations.
-What the node operator can do is to entangle a pair of routing combinations by adjusting the corresponding off diagonal component of the Hamiltonian.
-This will change the overall fee structure for the channel by correspondingly increasing or decreasing the ppm routing fee.
 
 \section{Conclusion}
 Hopefully this will all work...
