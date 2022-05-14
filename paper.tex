@@ -1,0 +1,285 @@
+\documentclass[review,12pt]{elsarticle}
+\usepackage[left=3.2cm, right=3.2cm, top=3.2cm, bottom=3.2cm]{geometry}
+
+\usepackage{lineno, hyperref}
+\modulolinenumbers[5]
+
+% \journal{Theoretical Economics}
+\usepackage{graphicx}
+% \usepackage[abbr]{harvard}
+\usepackage{amsmath}
+% \usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{braket}
+\usepackage{threeparttable}
+\usepackage[table]{xcolor}
+
+% Solution to fix compiler warning https://tex.stackexchange.com/a/515199
+\usepackage{regexpatch}
+\makeatletter
+\regexpatchcmd\ps@pprintTitle
+  {\cE\}\ \cE\}}{\cE\}\cE\}}
+  {}{\FailedToPatch}
+\makeatother
+
+% \RequirePackage[colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue,pagebackref]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Elsevier bibliography styles
+%%%%%%%%%%%%%%%%%%%%%%%
+%% To change the style, put a % in front of the second line of the current style and
+%% remove the % from the second line of the style you would like to use.
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Numbered
+%\bibliographystyle{model1-num-names}
+
+%% Numbered without titles
+%\bibliographystyle{model1a-num-names}
+
+%% Harvard
+\bibliographystyle{model2-names.bst}\biboptions{authoryear}
+
+%% Vancouver numbered
+%\usepackage{numcompress}\bibliographystyle{model3-num-names}
+
+%% Vancouver name/year
+%\usepackage{numcompress}\bibliographystyle{model4-names}\biboptions{authoryear}
+
+%% APA style
+%\bibliographystyle{model5-names}\biboptions{authoryear}
+
+%% AMA style
+%\usepackage{numcompress}\bibliographystyle{model6-num-names}
+
+%% `Elsevier LaTeX' style
+%\bibliographystyle{elsarticle-num}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                          %%
+%% Uncomment next line to change            %%
+%% the type of equation numbering           %%
+%%                                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\numberwithin{equation}{section}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                          %%
+%% For Assumption, Axiom, Claim, Corollary, %%
+%% Lemma, Theorem, Proposition, Hypothesis, %%
+%% Fact                                     %%
+%% use \theoremstyle{plain}                 %%
+%%                                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \theoremstyle{plain}
+\newtheorem{axiom}{Axiom}
+\newtheorem{postulate}{Postulate}
+\newtheorem{claim}[axiom]{Claim}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newdefinition{remark}{Remark}
+\newdefinition{definition}{Definition}
+\newproof{proof}{Proof}
+% \newtheorem*{fact}{Fact}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                          %%
+%% For Definition, Example, Remark,         %%
+%% Notation, Property                       %%
+%% use \theoremstyle{remark}                %%
+%%                                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \theoremstyle{remark}
+% \newtheorem{definition}[theorem]{Definition}
+% \newtheorem*{example}{Example}
+
+\newcommand{\proofofref}{}
+\newproof{zproofof}{Proof of \proofofref}
+\newenvironment{proofof}[1]
+ {\renewcommand{\proofofref}{#1}\zproofof}
+ {\endzproofof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Local Definitions definitions:           %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{\mathrm{Var}}
+\DeclareMathOperator{\Cov}{\mathrm{Cov}}
+\DeclareMathOperator{\Tr}{\mathrm{Tr}}
+\newcolumntype{L}{>{\centering\arraybackslash}p{0.085\linewidth}}
+
+\begin{document}
+
+\begin{frontmatter}
+
+  \title{Algorithm for Calculating Lightning Node Fees}
+
+  %   %% Group authors per affiliation:
+  \author[1]{Cal Abel\texorpdfstring{\footnote{Declarations of interest: none}}}\corref{cor1}
+  \address[1]{2600 Century Parkway, Ste. 100, Atlanta, GA, USA}
+
+  %   %% include affiliations in footnotes:
+  \author[1]{Skylane Engineering, LLC}
+  \ead[url]{https://skylaneengineering.com}
+
+  \cortext[cor1]{Corresponding author}
+  \ead{crabel@skylaneengineering.com}
+
+  %   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %   %% Abstract                                 %%
+  %   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \begin{abstract}
+
+  \end{abstract}
+
+  %   \begin{keyword}
+
+  %   \end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Introduction                                                                                %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+The objective of this paper is to lay out the structure of an algorithmic fee structure for routing channel in the Lightning Network.
+With current technology, channels are limited in their ability to dynamically assess fees based on channel balance.
+What we propose is a method by which a node will use the fee structure to become self balancing, and charging a higher fee for transactions that are routed that take a channel out of balance.
+
+To do this wee need to first formally define a metric for channel balancing.
+This is done by treating the sats locked up in a channel as a microcanonical ensemble.
+This will provide us with a combinatorial definition of entropy, which when maximized will define a channel being balanced.
+
+The overall approach of this method is to set up a fee structure using the equivalent of the Helmholtz potential.
+We will look at cases where a node operator may choose to entangle some channels based on a desire to ensure certain channels have a higher entropy than others based on transaction traffic.
+
+\section{Defining the Ensemble}
+We begin by considering a node in isolation from the rest of the network.
+When a node is created traditionally created it is an entirely self funded channel.
+
+\subsection{Ensemble of 1 Satoshi}
+Let's look at a single sat channel.
+The sat can be in either the inbound state, $\Ket{I}$, or an outbound state, $\Ket{O}$.
+Because the sat exists classically a pure state cannot exist as a superposition,
+\begin{equation}
+  \Ket{\psi} = c_I\Ket{I} + c_O\Ket{O} \; \left\{c_I,c_O\right\} \in \left\{0,1\right\} \textrm{ and } c_I \neq c_O \nonumber
+\end{equation}
+
+For this single satoshi we will define its potential relative to the direction that it can be spent.
+Thus the sat in $\Ket{I}$ will have a $(+)$ potential and in $\Ket{O}$ a $(-)$ potential.
+Because the magnitude value of the satoshi is symmetric we can define the the Hamiltonian as,
+\begin{equation}
+  \hat{H} =   \left[ {\begin{array}{cc}
+          u_0 & 0    \\
+          0   & -u_0 \\
+        \end{array} } \right].\nonumber
+\end{equation}
+Thus,
+\begin{eqnarray}
+  \hat{H}\Ket{I} & = & u_0\Ket{I} \textrm{ and} \nonumber\\
+  \hat{H}\Ket{O} & = & -u_0\Ket{O}. \nonumber
+\end{eqnarray}
+
+\subsection{Ensemble of Many Satoshi}
+We define a channel with $M$ total satoshi and describe the occupancy of the inbound state as $m_I$ and the outbound state as $m_O$.
+With the channel so defined we want to to now count the number of different ways that the channel, its multiplicity which is
+\begin{equation}
+  W = \frac{M!}{m_I!m_O!}. \nonumber
+\end{equation}
+And define its logarithm as,
+\begin{equation}
+  S = \log W. \nonumber
+\end{equation}
+Which for large $M$, and applying the Stirling approximation simplifies to,
+\begin{equation}
+  S = \sum_j m_j \log\frac{M}{m_j}.\label{eq:1}
+\end{equation}
+Equation \ref{eq:1} represents the measure of the channels size and, when maximized its balance
+
+\subsection{The Canonical Ensemble}
+Because a channel is fixed in its size, the total number of satoshi are invariant with time.
+If we bring the channel onto the network where other channels can access it to route payments, we can consider it as an ensemble of a fixed size brought into contact with a reservoir.
+This is the canonical ensemble, whose most probable density matrix is,
+\begin{equation}
+  \hat{\rho} = \frac{1}{Z}e^{-\beta M \left\lvert \hat{H} \right\rvert}. \nonumber
+\end{equation}
+Where $Z$ is the normalization constant and is also called the partition function.
+
+\subsection{Perturbations form Equilibrium}
+The equilibrium state occurs when the channel is balanced thus the probability of finding a satoshi in either the inbound or outbound channels is $p_I=p_O=1/2$.
+This isn't very interesting mathematically so we will consider small perturbations around the equilibrium state.
+We recall for the canonical ensemble the Helmholtz potential is,
+\begin{equation}
+  F \equiv - \frac{1}{\beta}\log Z = \Braket{U} - TS. \nonumber
+\end{equation}
+Where, $T \equiv 1/\beta$.
+
+For a small perturbation,
+\begin{equation}
+  F + \delta F = \Braket{U} + \left\lvert \delta \Braket{U} \right\rvert - T(S + \delta S).\footnote{
+    We take the absolute value of the perturbation because our definition of the sign of the Hamiltonian eigenvectors was entirely arbitrary.
+  } \nonumber
+\end{equation}
+Which reduces to,
+\begin{equation}
+  \delta F =  \left\lvert \delta \Braket{U} \right\rvert - T \delta S. \nonumber
+\end{equation}
+
+Finally if we take the difference between two perturbations,
+\begin{equation}
+  \Delta F =  \left\lvert \Delta \Braket{U} \right\rvert - T \Delta S. \label{eq:2}
+\end{equation}
+
+We take equation \ref{eq:2} as the difference in the potential between the two near equilibrium channel configurations.
+Recalling that the Helmholtz potential represents the amount of available work, we will take this as the available potential for extracting a fee.
+
+The $\left\lvert \Delta \Braket{U} \right\rvert$ represents the traditional channel ppm fee.
+However there is an additional fee for moving the channel farther from balance and for bringing it closer to balance, $- T \Delta S$.
+It is important to note that the derivation did not include a per transaction fee.
+
+Because equation \ref{eq:2} can be negative, we will exclude the case where the channel operator would pay to balance the channel.
+The transaction fee is thus,
+
+\boxed{
+  \begin{aligned}
+     & \textrm{Fee} = \max(0,\Delta F). \nonumber
+  \end{aligned}
+}
+
+
+\section{Measuring Temperature}
+Recall in defining the ensemble that we did not consider the time dependent, kinetic, portion of the Hamiltonian.
+It is not something that is clearly defined for sats on a lightning channel.
+
+Instead we need to look at how the channel is being used in the entire network.
+To do this we need to look at the transaction distribution across the channel or for the node.
+This distribution should follow some form of the gamma distribution.
+If this provides a reasonable estimation, the rate factor, $\beta$, is the inverse temperature \cite[p.~76]{Gibbs:1902}.
+
+The node operator would then need to determine what the fractional charge for temperature would be.
+This in effect becomes an average per transaction fee of the change in the entropy.
+It's not clear at this time if the measured channel temperature should be used to assess the fee directly, or if it should be multiplied by some constant.
+
+\section{Entanglement}
+A node operator may wish to preferentially encourage or penalize a particular node to which they have a channel.
+We can do this by looking expanding our single channel ensemble to that of the composite of the node.
+This is done through the node's combined Hamiltonian.
+
+If we take small routing node with three channels, there are $2^3$ possible routing combinations.
+What the node operator can do is to entangle a pair of routing combinations by adjusting the corresponding off diagonal component of the Hamiltonian.
+This will change the overall fee structure for the channel by correspondingly increasing or decreasing the ppm routing fee.
+
+\section{Conclusion}
+Hopefully this will all work...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Acknowledgements                                                                            %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section*{Acknowledgements}
+
+
+\bibliography{paper.bib}
+
+\end{document}
