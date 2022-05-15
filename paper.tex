@@ -156,51 +156,89 @@ This will provide us with a combinatorial definition of entropy, which when maxi
 The overall approach of this method is to set up a fee structure using the equivalent of the Helmholtz potential.
 
 \section{Defining the Ensemble}
-We begin by considering a node in isolation from the rest of the network.
-When a node is created traditionally created it is an entirely self funded channel.
+Ensembles are simply collections of a bunch of different things.
+They are extremely useful in physics as their application allows the physicist to be able to describe the stochastic behavior of the ensemble's objects under a different set of constraints.
+These different constraints create a number of different and corresponding physical potentials.
+Three of the more common ensembles are the microcanonical, canonical, and grand canonical.
 
-\subsection{Ensemble of 1 Satoshi}
-Let's look at a single sat channel.
-The sat can be in either the inbound state, $\Ket{I}$, or an outbound state, $\Ket{O}$.
-Because the sat exists classically a pure state cannot exist as a superposition,
+In the case of the microcanonical ensemble we are seeking to describe a system that is in complete isolation from its surroundings, subject to the constraint of its probabilities summing to unity.
+In the canonical distribution, we add the knowledge of the average energy of the system to the constraint of the microcanonical distribution.
+This results in the Helmholtz potential, which expresses the amount of energy available to do work.
+The grand canonical ensemble adds the constraint of the average occupancy of the energy levels to the canonical ensemble.
+This adds the ability for the ensemble to fluctuate in size and energy.
+The grand canonical ensemble results in the Gibbs potential which is a measure of doing chemical work.
+
+While we are not considering physics, we are applying the statistical tools to the problem at hand.
+As a result, it is important to consider how those tools have been interpreted in another context, to get clues on how to interpret them in the current context.
+
+\subsection{Microcanonical Ensemble}
+Let's look at a single sat channel in isolation from its surroundings.
+Borrowing from quantum mechanics, we use the Dirac notation to express our vector space.
+Because our system is so small we can define an orthonormal basis for our satoshi, with two vectors representing whether the satoshi is in the:
+\begin{itemize}
+  \item inbound state $\Ket{I}$ or the
+  \item outbound state $\Ket{O}$.
+\end{itemize}
+
+Because the sat exists classically, a pure state cannot exist as a superposition,
 \begin{equation}
   \Ket{\psi} = c_I\Ket{I} + c_O\Ket{O} \; \left\{c_I,c_O\right\} \in \left\{0,1\right\} \textrm{ and } c_I \neq c_O \nonumber
 \end{equation}
 
-For this single satoshi we will define its potential relative to the direction that it can be spent.
-Thus the sat in $\Ket{I}$ will have a $(+)$ potential and in $\Ket{O}$ a $(-)$ potential.
-Because the magnitude value of the satoshi is symmetric we can define the the Hamiltonian as,
+Now that we have the definition of vector representation of a satoshi, we need to define its potential relative to the direction that it can be "spent".
+For the sat in $\Ket{I}$, because it can move to the outbound state, it has a $(+)$ potential and conversely for $\Ket{O}$ a $(-)$ potential.
+Because the magnitude of the satoshi's value is symmetric, we can define the the Hamiltonian as,
 \begin{equation}
-  \hat{H} =   \left[ {\begin{array}{cc}
+  \hat{H} = \left[ {\begin{array}{cc}
           u_0 & 0    \\
           0   & -u_0 \\
         \end{array} } \right].\nonumber
 \end{equation}
-Thus,
+Using the properties of the orthonormal basis vectors, we have,
 \begin{eqnarray}
   \hat{H}\Ket{I} & = & u_0\Ket{I} \textrm{ and} \nonumber\\
   \hat{H}\Ket{O} & = & -u_0\Ket{O}. \nonumber
 \end{eqnarray}
+Because the Hamiltonian in this case is only describing potentials, it can have negative eigenvalues.
 
-\subsection{Ensemble of Many Satoshi}
+Since the system is in isolation from its surroundings each of the possible basis vectors is equally probable.
+This results in the density matrix,
+\begin{equation}
+  \hat{\rho} = \left[ {\begin{array}{cc}
+          \frac{1}{2} & 0           \\
+          0           & \frac{1}{2} \\
+        \end{array} } \right].\nonumber
+\end{equation}
+This is a similar Hamiltonian to a paramagnet.
+Unlike a paramagnet the definition of the sign of the potential in a lightning channel is arbitrary, and therefore exhibits a symmetry.
+
+We note that under these conditions the expectation of the Hamiltonian is,
+\begin{equation}
+  \Braket{\hat{H}} = \Tr \hat{\rho}\hat{H} = 0. \nonumber
+\end{equation}
+
+\subsection{Canonical Ensemble}
 We define a channel with $M$ total satoshi and describe the occupancy of the inbound state as $m_I$ and the outbound state as $m_O$.
-With the channel so defined we want to to now count the number of different ways that the channel, its multiplicity which is
+With the larger channel defined, we need to count the number of different ways that it can be configured, its multiplicity,
 \begin{equation}
   W = \frac{M!}{m_I!m_O!}. \nonumber
 \end{equation}
-And define its logarithm as,
+The multiplicity, $W$, is the number of equally probable configurations for the ensemble.
+We define the channel's entropy as,
 \begin{equation}
-  S = \log W. \nonumber
+  S \equiv \log W. \nonumber
 \end{equation}
-Which for large $M$, and applying the Stirling approximation simplifies to,
+
+For large $M$ we can simplify the entropy by applying the Stirling approximation,
 \begin{equation}
   S = \sum_j m_j \log\frac{M}{m_j}.\label{eq:1}
 \end{equation}
-Equation \ref{eq:1} represents the measure of the channels size and, when maximized its balance
+Equation \ref{eq:1} represents the measure of the channels complexity.
+When $S = \max S$, the system is in its most complex configuration.
+If we were to convert $S$ to a base-2 logarithm, it would represent the information entropy, or the number of binary questions needed to be asked to determine the location of each satoshi.
 
-\subsection{The Canonical Ensemble}
 Because a channel is fixed in its size, the total number of satoshi are invariant with time.
-If we bring the channel onto the network where other channels can access it to route payments, we can consider it as an ensemble of a fixed size brought into contact with a reservoir.
+If we bring the channel onto the network where other channels can access it to route payments, we can consider it as an ensemble of a fixed size brought into contact with a thermal reservoir.
 This is the canonical ensemble, whose most probable density matrix is,
 \begin{equation}
   \hat{\rho} = \frac{1}{Z}e^{-\beta M \left\lvert \hat{H} \right\rvert}. \nonumber
@@ -209,16 +247,18 @@ Where $Z$ is the normalization constant and is also called the partition functio
 
 \subsection{Perturbations form Equilibrium}
 The equilibrium state occurs when the channel is balanced thus the probability of finding a satoshi in either the inbound or outbound channels is $p_I=p_O=1/2$.
-This isn't very interesting mathematically so we will consider small perturbations around the equilibrium state.
+If the channel had eigenvalues of the Hamiltonian differing in absolute magnitude, while keeping differing signs, the chanel would have a different equilibrium distribution of occupancy.
+
+Next we consider small perturbations around the equilibrium state.
 We recall for the canonical ensemble the Helmholtz potential is,
 \begin{equation}
   F \equiv - \frac{1}{\beta}\log Z = \Braket{U} - TS. \nonumber
 \end{equation}
-Where, $T \equiv 1/\beta$.
+Where the temperature is defined as $T \equiv 1/\beta$.
 
 For a small perturbation,
 \begin{equation}
-  F + \delta F = \Braket{U} + \left\lvert \delta \Braket{U} \right\rvert - T(S + \delta S).\footnote{
+  F_{\max S} + \delta F = \Braket{U}_{\max S} + \left\lvert \delta \Braket{U} \right\rvert - T(S_{\max S} + \delta S).\;\footnote{
     We take the absolute value of the perturbation because our definition of the sign of the Hamiltonian eigenvectors was entirely arbitrary.
   } \nonumber
 \end{equation}
@@ -242,27 +282,31 @@ It is important to note that the derivation did not include a per transaction fe
 Because equation \ref{eq:2} can be negative, we will exclude the case where the channel operator would pay to balance the channel.
 The transaction fee is thus,
 
-\boxed{
-  \begin{aligned}
-     & \textrm{Fee} = \max(0,\Delta F). \nonumber
-  \end{aligned}
-}
+\begin{center}
+  \boxed{
+    \begin{aligned}
+       & \textrm{Fee} = \max(0,\left\lvert \Delta \Braket{U} \right\rvert - T \Delta S). \nonumber
+    \end{aligned}
+  }
+\end{center}
+
 
 \section{Measuring Temperature}
 Recall in defining the ensemble that we did not consider the time dependent, kinetic, portion of the Hamiltonian.
 It is not something that is clearly defined for sats on a lightning channel.
 
-Instead we need to look at how the channel is being used in the entire network.
-To do this we need to look at the transaction distribution across the channel or for the node.
+Instead we need to look at how the channel/node is being used in the entire network.
+To do this we need to look at the transaction distribution across the channel/node.
 This distribution should follow some form of the gamma distribution.
 If this provides a reasonable estimation, the rate factor, $\beta$, is the inverse temperature \cite[p.~76]{Gibbs:1902}.
 
-The node operator would then need to determine what the fractional charge for temperature would be.
+The node operator would then need to determine what the fractional charge for temperature would satisfactory.
 This in effect becomes an average per transaction fee of the change in the entropy.
 It's not clear at this time if the measured channel temperature should be used to assess the fee directly, or if it should be multiplied by some constant.
 
 \section{Conclusion}
-Hopefully this will all work...
+By adopting a routing fee structure outlined in here, a node signals to the network the state of their channel and how the proposed route impacts the channel to the network through its fee.
+By tying the fee to the state of the node and the relation of the transaction to be routed to the fee, we have a clear
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Acknowledgements                                                                            %%%
