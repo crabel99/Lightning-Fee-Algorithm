@@ -131,6 +131,8 @@
   \begin{abstract}
     This paper outlines a simple strategy to create channels on a Lightning Network routing node that will tend toward a balanced configuration.
     The algorithm is derived from the principles of statistical mechanics and uses the Helmholtz potential to dynamically assess either inbound or outbound fees.
+    If this fee strategy is widely adopted, the network will tend toward a state of equilibrium with the lowest overall fee structure.
+    In the derivation of the fee, the central role that a channel's entropy plays in quantify a channel's status.
   \end{abstract}
 
   %   \begin{keyword}
@@ -187,7 +189,7 @@ Because the sat exists classically, a pure state cannot exist as a superposition
 
 Now that we have the definition of vector representation of a satoshi, we need to define its potential relative to the direction that it can be "spent".
 For the sat in $\Ket{I}$, because it can move to the outbound state, it has a $(+)$ potential and conversely for $\Ket{O}$ a $(-)$ potential.
-Because the magnitude of the satoshi's value is symmetric, we can define the the Hamiltonian as,
+Considering a channel that is symmetric, we can define the the Hamiltonian as,
 \begin{equation}
   \hat{H} = \left[ {\begin{array}{cc}
           u_0 & 0    \\
@@ -244,12 +246,15 @@ This is the canonical ensemble, whose most probable density matrix is,
   \hat{\rho} = \frac{1}{Z}e^{-\beta M \left\lvert \hat{H} \right\rvert}. \nonumber
 \end{equation}
 Where $Z$ is the normalization constant and is also called the partition function.
+This density matrix is different what we would normally have because of the absolute values around the Hamiltonian.
+The reason why the absolute value was added is that the sign in the Hamiltonian was arbitrary and that due to this symmetry the probability of occupancy needs to be independent of the sign.
 
 \subsection{Perturbations form Equilibrium}
 The equilibrium state occurs when the channel is balanced thus the probability of finding a satoshi in either the inbound or outbound channels is $p_I=p_O=1/2$.
 If the channel had eigenvalues of the Hamiltonian differing in absolute magnitude, while keeping differing signs, the chanel would have a different equilibrium distribution of occupancy.
+The effect that by setting different potentials, the channel can be adjusted to have a different equilibrium distribution of satoshi.
 
-Next we consider small perturbations around the equilibrium state.
+Next we consider small perturbations around the equilibrium state to linearize our model.
 We recall for the canonical ensemble the Helmholtz potential is,
 \begin{equation}
   F \equiv - \frac{1}{\beta}\log Z = \Braket{U} - TS. \nonumber
@@ -291,7 +296,7 @@ The transaction fee is thus,
 \end{center}
 
 
-\section{Measuring Temperature}
+\section{Estimating Temperature}
 Recall in defining the ensemble that we did not consider the time dependent, kinetic, portion of the Hamiltonian.
 It is not something that is clearly defined for sats on a lightning channel.
 
@@ -302,11 +307,16 @@ If this provides a reasonable estimation, the rate factor, $\beta$, is the inver
 
 The node operator would then need to determine what the fractional charge for temperature would satisfactory.
 This in effect becomes an average per transaction fee of the change in the entropy.
-It's not clear at this time if the measured channel temperature should be used to assess the fee directly, or if it should be multiplied by some constant.
+It's not clear at this time if the measured channel/node temperature should be used to assess the fee directly, or if it should be multiplied by some constant.
 
 \section{Conclusion}
 By adopting a routing fee structure outlined in here, a node signals to the network the state of their channel and how the proposed route impacts the channel to the network through its fee.
-By tying the fee to the state of the node and the relation of the transaction to be routed to the fee, we have a clear
+We have a method that creates an incentive to balance the node, because the fee is directly related to the state of the channel and its relationship relative to the transaction being routed.
+If enough nodes adopt such a strategy for charging fees, the network can reach a state of statistical equilibrium, where the overall entropy of the network is maximized.
+
+Furthermore, it is apparent the importance that a node's channel entropy plays in its ability to route transactions.
+The channel's entropy measures both its capacity, and its overall balance.
+Entropy is a critical measure in channel assessment even if the strategy proposed here for calculating routing fees is not adopted.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Acknowledgements                                                                            %%%
